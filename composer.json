@@ -1,0 +1,34 @@
+{
+  "name": "miolae/yii2-billing",
+  "description": "Flexible billing module to manage different accounts and pay systems and make transactions",
+  "keywords": ["yii2", "yii2-user", "user management", "miolae"],
+  "type": "yii2-extension",
+  "license": "MIT",
+  "support": {
+    "issues": "https://github.com/miolae/yii2-user/issues?state=open",
+    "forum": "https://gitter.im/miolae/yii2-user",
+    "source": "https://github.com/miolae/yii2-user"
+  },
+  "authors": [
+    {
+      "name": "Dmitry Erofeev",
+      "email": "viktorprogger@gmail.com"
+    }
+  ],
+  "minimum-stability": "dev",
+  "require": {
+    "php": ">=7.1.0",
+    "yiisoft/yii2": "^2.0.15"
+  },
+  "require-dev": {
+    "roave/security-advisories": "dev-master",
+    "yiisoft/yii2-codeception": "^2.0.0",
+    "codeception/specify": "^0.4.3",
+    "codeception/verify": "^0.3.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "miolae\\billing\\": ""
+    }
+  }
+}
