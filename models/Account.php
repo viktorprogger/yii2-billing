@@ -8,6 +8,7 @@ use yii\db\ActiveRecord;
  * Class Account
  * @package miolae\billing\models
  *
+ * @property int    id
  * @property float  amount
  * @property int    owner_id
  * @property float  hold
