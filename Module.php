@@ -5,6 +5,12 @@ namespace miolae\billing;
 use yii\base\Component;
 use yii\base\Module as BaseModule;
 
+/**
+ * Class Module
+ * @package miolae\billing
+ *
+ * @property-read Component|null db
+ */
 class Module extends BaseModule
 {
     /** @var array Model map */
