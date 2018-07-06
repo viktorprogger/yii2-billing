@@ -16,6 +16,10 @@ use yii\db\ActiveRecord;
  * @property float  hold
  * @property int    type
  * @property string title
+ * @property int    created_at
+ * @property int    updated_at
+ * @property int    created_by
+ * @property int    updated_by
  */
 class Account extends ActiveRecord
 {

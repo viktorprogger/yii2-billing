@@ -18,6 +18,10 @@ use yii\db\ActiveRecord;
  * @property float   amount
  * @property int     status Current invoice status. May be one of
  * @property string  reason The reason why this invoice is created. E.g. "refill account with PayPal".
+ * @property int     created_at
+ * @property int     updated_at
+ * @property int     created_by
+ * @property int     updated_by
  */
 class Invoice extends ActiveRecord
 {
