@@ -2,6 +2,8 @@
 
 namespace miolae\billing\models;
 
+use miolae\billing\traits\BlameableTrait;
+use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 
 /**
@@ -17,11 +19,18 @@ use yii\db\ActiveRecord;
  */
 class Account extends ActiveRecord
 {
+    use BlameableTrait;
+
     const TYPE_BLACKHOLE = 1;
     const TYPE_NORMAL = 2;
 
     public static function tableName()
     {
         return '{{%billing_accounts}}';
+    }
+
+    public function behaviors()
+    {
+        return array_merge(self::getBehaviors(), [TimestampBehavior::class]);
     }
 }

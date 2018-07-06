@@ -20,6 +20,11 @@ class m180629_174726_create_models extends Migration
             'hold'     => $this->float(4)->notNull(),
             'type'     => $this->tinyInteger()->notNull(),
             'owner_id' => $this->integer(),
+
+            'created_at' => $this->integer()->notNull(),
+            'updated_at' => $this->integer()->notNull(),
+            'created_by' => $this->integer(),
+            'updated_by' => $this->integer(),
         ]);
 
         $this->createTable(Account::tableName(), [
@@ -29,6 +34,11 @@ class m180629_174726_create_models extends Migration
             'amount'          => $this->float(4)->notNull(),
             'status'          => $this->tinyInteger()->notNull(),
             'reason'          => $this->string(),
+
+            'created_at' => $this->integer()->notNull(),
+            'updated_at' => $this->integer()->notNull(),
+            'created_by' => $this->integer(),
+            'updated_by' => $this->integer(),
         ]);
     }
 
