@@ -1,6 +1,7 @@
 <?php
 
 use miolae\billing\models\Account;
+use miolae\billing\models\Transaction;
 use yii\db\Migration;
 
 /**
@@ -34,6 +35,21 @@ class m180629_174726_create_models extends Migration
             'amount'          => $this->float(4)->notNull(),
             'status'          => $this->tinyInteger()->notNull(),
             'reason'          => $this->string(),
+
+            'created_at' => $this->integer()->notNull(),
+            'updated_at' => $this->integer()->notNull(),
+            'created_by' => $this->integer(),
+            'updated_by' => $this->integer(),
+        ]);
+
+        $this->createTable(Transaction::tableName(), [
+            'id'          => $this->primaryKey(),
+            'invoice_id'  => $this->integer()->notNull(),
+            'status'      => $this->tinyInteger()->notNull(),
+            'amount'      => $this->float(4)->notNull(),
+            'type'        => $this->tinyInteger()->notNull(),
+            'initializer' => $this->integer()->notNull(),
+            'reason'      => $this->string(),
 
             'created_at' => $this->integer()->notNull(),
             'updated_at' => $this->integer()->notNull(),
