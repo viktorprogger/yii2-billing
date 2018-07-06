@@ -7,7 +7,7 @@ use yii\web\IdentityInterface;
 
 trait BlameableTrait
 {
-    public function getBehaviors() {
+    public static function getBlameableBehavior() {
         $result = [];
 
         if (\Yii::$app->has('user') && \Yii::$app->user->identityClass) {

@@ -35,6 +35,6 @@ class Account extends ActiveRecord
 
     public function behaviors()
     {
-        return array_merge(self::getBehaviors(), [TimestampBehavior::class]);
+        return array_merge(self::getBlameableBehavior(), [TimestampBehavior::class]);
     }
 }
