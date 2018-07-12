@@ -32,13 +32,13 @@ class Invoice extends ActiveRecord
      *
      * @see Invoice::status
      */
-    const TYPE_CREATE = 1;
+    const STATUS_CREATE = 1;
     /** Funds are held within the account */
-    const TYPE_HOLD = 2;
+    const STATUS_HOLD = 2;
     /** Funds are moved to the target account */
-    const TYPE_SUCCESS = 3;
+    const STATUS_SUCCESS = 3;
     /** Operation is cancelled */
-    const TYPE_CANCEL = 4;
+    const STATUS_CANCEL = 4;
 
     public static function tableName()
     {

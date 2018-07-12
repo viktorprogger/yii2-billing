@@ -1,6 +1,7 @@
 <?php
 
 use miolae\billing\models\Account;
+use miolae\billing\models\Invoice;
 use miolae\billing\models\Transaction;
 use yii\db\Migration;
 
@@ -28,7 +29,7 @@ class m180629_174726_create_models extends Migration
             'updated_by' => $this->integer(),
         ]);
 
-        $this->createTable(Account::tableName(), [
+        $this->createTable(Invoice::tableName(), [
             'id'              => $this->primaryKey(),
             'account_id_from' => $this->integer()->notNull(),
             'account_id_to'   => $this->integer()->notNull(),
