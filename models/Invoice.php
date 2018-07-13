@@ -53,11 +53,11 @@ class Invoice extends ActiveRecord
     public function rules()
     {
         return [
-            [['from_id', 'to_id', 'amount'], 'required'],
+            [['status'], 'default', 'value' => static::STATUS_CREATE],
+            [['from_id', 'to_id', 'amount', 'status'], 'required'],
             [['from_id', 'to_id', 'amount', 'reason'], 'safe'],
             [['from_id', 'to_id'], 'integer'],
             [['amount'], 'float'],
-            [['status'], 'default', 'value' => static::STATUS_CREATE],
             [['amount'], 'number', 'min' => 1, 'message' => 'Возможен перевод от 1 рубля и больше'],
             [['from_id'], 'exist', 'targetRelation' => 'accountFrom'],
             [['to_id'], 'exist', 'targetRelation' => 'accountTo'],
