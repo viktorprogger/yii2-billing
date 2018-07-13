@@ -15,7 +15,6 @@ use yii\db\ActiveRecord;
  * @property Invoice invoice
  * @property int     status
  * @property int     type
- * @property int     initializer
  * @property string  reason
  * @property int     created_at
  * @property int     updated_at

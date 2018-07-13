@@ -49,7 +49,6 @@ class m180629_174726_create_models extends Migration
             'status'      => $this->tinyInteger()->notNull(),
             'amount'      => $this->float(4)->notNull(),
             'type'        => $this->tinyInteger()->notNull(),
-            'initializer' => $this->integer()->notNull(),
             'reason'      => $this->string(),
 
             'created_at' => $this->integer()->notNull(),
