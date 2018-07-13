@@ -10,12 +10,17 @@ use yii\db\ActiveRecord;
  * Class Transaction
  * @package miolae\billing\models
  *
- * @property int    id
- * @property int    invoice_id
- * @property int    status
- * @property int    type
- * @property int    initializer
- * @property string reason
+ * @property int     id
+ * @property int     invoice_id
+ * @property Invoice invoice
+ * @property int     status
+ * @property int     type
+ * @property int     initializer
+ * @property string  reason
+ * @property int     created_at
+ * @property int     updated_at
+ * @property int     created_by
+ * @property int     updated_by
  */
 class Transaction extends ActiveRecord
 {
