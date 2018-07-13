@@ -40,6 +40,22 @@ class Account extends ActiveRecord
         return array_merge(self::getBlameableBehavior(), [TimestampBehavior::class]);
     }
 
+    public function rules()
+    {
+        return [
+            [['owner_id', 'amount', 'hold'], 'default', 'value' => 0],
+            [['type'], 'default', 'value' => static::TYPE_NORMAL],
+            [['amount', 'hold', 'type', 'title'], 'required'],
+            [['type', 'owner_id'], 'integer'],
+            [['amount', 'hold', 'owner_id',], 'number', 'min' => 0],
+            [['amount', 'hold'], function() {
+                if ($this->amountAvailable < 0) {
+                    $this->addError('Недостаточно средств на счете');
+                }
+            }],
+        ];
+    }
+
     public function getInvoicesIncoming()
     {
         return $this->hasMany(Invoice::class, ['to_id', 'id']);
