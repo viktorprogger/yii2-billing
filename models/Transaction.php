@@ -25,7 +25,7 @@ class Transaction extends ActiveRecord
     const STATUS_CREATED = 1;
     /** Transaction status after all actions with accounts/invoices are successfully finished */
     const STATUS_SUCCESS = 2;
-    /** Transaction status after any action with accounts/invoices are failed (e.g. not enough funds to transact */
+    /** Transaction status after any action with accounts/invoices are failed (e.g. not enough funds to transact) */
     const STATUS_FAIL = 3;
 
     /** Transaction is created on invoice creation */
@@ -45,5 +45,10 @@ class Transaction extends ActiveRecord
     public function behaviors()
     {
         return array_merge(self::getBlameableBehavior(), [TimestampBehavior::class]);
+    }
+
+    public function getInvoice()
+    {
+        return $this->hasOne(Invoice::class, ['id', 'invoice_id']);
     }
 }

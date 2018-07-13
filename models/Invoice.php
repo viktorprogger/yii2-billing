@@ -16,7 +16,7 @@ use yii\db\ActiveRecord;
  * @property Account accountFrom
  * @property Account accountTo
  * @property float   amount
- * @property int     status Current invoice status. May be one of
+ * @property int     status Current invoice status.
  * @property string  reason The reason why this invoice is created. E.g. "refill account with PayPal".
  * @property int     created_at
  * @property int     updated_at
@@ -48,5 +48,20 @@ class Invoice extends ActiveRecord
     public function behaviors()
     {
         return array_merge(self::getBlameableBehavior(), [TimestampBehavior::class]);
+    }
+
+    public function getAccountFrom()
+    {
+        return $this->hasOne(Account::class, ['id' => 'from_id']);
+    }
+
+    public function getAccountTo()
+    {
+        return $this->hasOne(Account::class, ['id' => 'to_id']);
+    }
+
+    public function getTransactions()
+    {
+        return $this->hasMany(Transaction::class, ['invoice_id' => 'id']);
     }
 }

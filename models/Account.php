@@ -10,16 +10,18 @@ use yii\db\ActiveRecord;
  * Class Account
  * @package miolae\billing\models
  *
- * @property int    id
- * @property float  amount
- * @property int    owner_id
- * @property float  hold
- * @property int    type
- * @property string title
- * @property int    created_at
- * @property int    updated_at
- * @property int    created_by
- * @property int    updated_by
+ * @property int       id
+ * @property float     amount
+ * @property int       owner_id
+ * @property float     hold
+ * @property int       type
+ * @property string    title
+ * @property int       created_at
+ * @property int       updated_at
+ * @property int       created_by
+ * @property int       updated_by
+ * @property Invoice[] invoicesIncoming
+ * @property Invoice[] invoicesOutgoing
  */
 class Account extends ActiveRecord
 {
@@ -36,5 +38,15 @@ class Account extends ActiveRecord
     public function behaviors()
     {
         return array_merge(self::getBlameableBehavior(), [TimestampBehavior::class]);
+    }
+
+    public function getInvoicesIncoming()
+    {
+        return $this->hasMany(Invoice::class, ['to_id', 'id']);
+    }
+
+    public function getInvoicesOutgoing()
+    {
+        return $this->hasMany(Invoice::class, ['from_id', 'id']);
     }
 }
