@@ -10,18 +10,20 @@ use yii\db\ActiveRecord;
  * Class Account
  * @package miolae\billing\models
  *
- * @property int       id
- * @property float     amount
- * @property int       owner_id
- * @property float     hold
- * @property int       type
- * @property string    title
- * @property int       created_at
- * @property int       updated_at
- * @property int       created_by
- * @property int       updated_by
- * @property Invoice[] invoicesIncoming
- * @property Invoice[] invoicesOutgoing
+ * @property int            id
+ * @property float          amount
+ * @property int            owner_id
+ * @property float          hold
+ * @property int            type
+ * @property string         title
+ * @property int            created_at
+ * @property int            updated_at
+ * @property int            created_by
+ * @property int            updated_by
+ *
+ * @property-read Invoice[] invoicesIncoming
+ * @property-read Invoice[] invoicesOutgoing
+ * @property-read float     amountAvailable
  */
 class Account extends ActiveRecord
 {
@@ -64,5 +66,10 @@ class Account extends ActiveRecord
     public function getInvoicesOutgoing()
     {
         return $this->hasMany(Invoice::class, ['from_id', 'id']);
+    }
+
+    public function getAmountAvailable()
+    {
+        return $this->amount - $this->hold;
     }
 }
