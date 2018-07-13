@@ -50,6 +50,20 @@ class Invoice extends ActiveRecord
         return array_merge(self::getBlameableBehavior(), [TimestampBehavior::class]);
     }
 
+    public function rules()
+    {
+        return [
+            [['from_id', 'to_id', 'amount'], 'required'],
+            [['from_id', 'to_id', 'amount', 'reason'], 'safe'],
+            [['from_id', 'to_id'], 'integer'],
+            [['amount'], 'float'],
+            [['status'], 'default', 'value' => static::STATUS_CREATE],
+            [['amount'], 'number', 'min' => 1, 'message' => 'Возможен перевод от 1 рубля и больше'],
+            [['from_id'], 'exist', 'targetRelation' => 'accountFrom'],
+            [['to_id'], 'exist', 'targetRelation' => 'accountTo'],
+        ];
+    }
+
     public function getAccountFrom()
     {
         return $this->hasOne(Account::class, ['id' => 'from_id']);
