@@ -51,6 +51,15 @@ class Transaction extends ActiveRecord
         return array_merge(self::getBlameableBehavior(), [TimestampBehavior::class]);
     }
 
+    public function rules()
+    {
+        return [
+            [['status'], 'default', 'value' => static::STATUS_CREATED],
+            [['invoice_id', 'status', 'type'], 'required'],
+            [['invoice_id', 'status', 'type'], 'integer'],
+        ];
+    }
+
     public function getInvoice()
     {
         return $this->hasOne(Invoice::class, ['id', 'invoice_id']);
