@@ -11,8 +11,8 @@ use yii\db\ActiveRecord;
  * @package miolae\billing\models
  *
  * @property int     id
- * @property int     from_id
- * @property int     to_id
+ * @property int     account_id_from
+ * @property int     account_id_to
  * @property Account accountFrom
  * @property Account accountTo
  * @property float   amount
@@ -54,23 +54,23 @@ class Invoice extends ActiveRecord
     {
         return [
             [['status'], 'default', 'value' => static::STATUS_CREATE],
-            [['from_id', 'to_id', 'amount', 'status'], 'required'],
-            [['from_id', 'to_id', 'amount', 'reason'], 'safe'],
-            [['from_id', 'to_id'], 'integer'],
+            [['account_id_from', 'account_id_to', 'amount', 'status'], 'required'],
+            [['account_id_from', 'account_id_to', 'amount', 'reason'], 'safe'],
+            [['account_id_from', 'account_id_to'], 'integer'],
             [['amount'], 'number', 'min' => 1, 'message' => 'Возможен перевод от 1 рубля и больше'],
-            [['from_id'], 'exist', 'targetRelation' => 'accountFrom'],
-            [['to_id'], 'exist', 'targetRelation' => 'accountTo'],
+            [['account_id_from'], 'exist', 'targetRelation' => 'accountFrom'],
+            [['account_id_to'], 'exist', 'targetRelation' => 'accountTo'],
         ];
     }
 
     public function getAccountFrom()
     {
-        return $this->hasOne(Account::class, ['id' => 'from_id']);
+        return $this->hasOne(Account::class, ['id' => 'account_id_from']);
     }
 
     public function getAccountTo()
     {
-        return $this->hasOne(Account::class, ['id' => 'to_id']);
+        return $this->hasOne(Account::class, ['id' => 'account_id_to']);
     }
 
     public function getTransactions()
