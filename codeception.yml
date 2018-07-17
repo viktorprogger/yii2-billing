@@ -5,6 +5,19 @@ paths:
     support: tests/_support
     envs: tests/_envs
 actor_suffix: Tester
+settings:
+    bootstrap: _bootstrap.php
+    colors: true
 extensions:
     enabled:
         - Codeception\Extension\RunFailed
+modules:
+    config:
+        Yii2:
+            configFile: 'tests/_app/config/test.php'
+coverage:
+    enabled: true
+    include:
+            - /models/*
+            - /traits/*
+            - /Module.php
