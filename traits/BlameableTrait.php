@@ -2,19 +2,21 @@
 
 namespace miolae\billing\traits;
 
+use yii\base\InvalidConfigException;
 use yii\behaviors\BlameableBehavior;
-use yii\web\IdentityInterface;
 
 trait BlameableTrait
 {
     public static function getBlameableBehavior() {
         $result = [];
 
-        if (\Yii::$app->has('user') && \Yii::$app->user->identityClass) {
-            $class = \Yii::$app->user->identityClass;
-            if ((new $class) instanceof IdentityInterface) {
+        try {
+            $user = \Yii::$app->get('user', false);
+
+            if (is_object($user)) {
                 $result[] = BlameableBehavior::class;
             }
+        } catch (InvalidConfigException $e) {
         }
 
         return $result;
