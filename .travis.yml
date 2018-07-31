@@ -1,0 +1,21 @@
+sudo: required
+dist: trusty
+
+env:
+  - COMPOSE_FILE=docker/travis.yml
+
+services:
+  - docker
+
+before_install:
+  - docker-compose up --force-recreate -d
+
+install:
+  - docker-compose exec -T app composer update --prefer-source --no-interaction
+  - docker-compose exec -T app php ./vendor/bin/codecept build
+  - sleep 10 # waiting for mysql to start accepting connections
+  - docker-compose exec -T app php ./tests/_app/yii.php migrate/fresh --interactive=0
+
+script:
+  #  - docker-compose exec -T app php -S 127.0.0.1:8080 > /dev/null 2>&1 & # will use with acceptance testing
+  - docker-compose exec -T app php ./vendor/bin/codecept run --debug

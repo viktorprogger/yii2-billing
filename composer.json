@@ -15,6 +15,12 @@
       "email": "viktorprogger@gmail.com"
     }
   ],
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "https://asset-packagist.org"
+    }
+  ],
   "minimum-stability": "stable",
   "require": {
     "php": ">=7.1.0",

@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/miolae/yii2-billing.svg?branch=master)](https://travis-ci.org/miolae/yii2-billing)
+
 # yii2-billing
 Billing module for Yii2 to manage accounts and make transactions between them.
 
