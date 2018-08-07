@@ -15,6 +15,12 @@
       "email": "viktorprogger@gmail.com"
     }
   ],
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "https://asset-packagist.org"
+    }
+  ],
   "minimum-stability": "stable",
   "require": {
     "php": ">=7.1.0",
@@ -25,7 +31,8 @@
     "codeception/codeception": "^2.0.0",
     "codeception/specify": "^0.4.3",
     "codeception/verify": "^0.3.1",
-    "phpunit/phpunit": "~7.0.0"
+    "phpunit/phpunit": "~7.0.0",
+    "squizlabs/php_codesniffer": "^3.3"
   },
   "autoload": {
     "psr-4": {
