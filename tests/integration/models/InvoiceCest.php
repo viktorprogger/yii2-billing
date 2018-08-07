@@ -13,7 +13,7 @@ class InvoiceCest
     }
 
     /**
-     * @covers Invoice::validate()
+     * @covers Invoice::rules()
      * @dataProvider validateProvider
      * @param $result
      * @param $attributes
