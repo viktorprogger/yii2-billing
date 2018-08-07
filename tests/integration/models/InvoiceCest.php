@@ -1,6 +1,6 @@
 <?php
 
-namespace models;
+namespace miolae\billing\tests\integration\models;
 
 use miolae\billing\models\Invoice;
 use miolae\billing\tests\fixtures\AccountFixture;
