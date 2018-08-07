@@ -14,10 +14,10 @@ extensions:
 modules:
     config:
         Yii2:
-            configFile: 'tests/_app/config/test.php'
+            configFile: 'tests/_app/config/console.php'
 coverage:
     enabled: true
     include:
-            - /models/*
-            - /traits/*
-            - /Module.php
+        - /models/*
+        - /traits/*
+        - /Module.php

@@ -1,5 +1,7 @@
 <?php
 
+use yii\console\controllers\MigrateController;
+
 return [
     'id' => 'yii2-test-console',
     'basePath' => dirname(__DIR__),
@@ -11,5 +13,11 @@ return [
         'log'   => null,
         'cache' => null,
         'db'    => require __DIR__ . '/db.php',
+    ],
+    'controllerMap' => [
+        'migrate' => [
+            'class' => MigrateController::class,
+            'migrationPath' => ['@miolae/billing/migrations'],
+        ],
     ],
 ];
