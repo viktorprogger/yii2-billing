@@ -63,6 +63,14 @@ class InvoiceCest
                     'amount'          => 0.1,
                 ],
             ],
+            'from and to accounts are identical'   => [
+                'result'     => false,
+                'attributes' => [
+                    'account_id_from' => 1,
+                    'account_id_to'   => 1,
+                    'amount'          => 1,
+                ],
+            ],
             'all is ok'               => [
                 'result'     => true,
                 'attributes' => [

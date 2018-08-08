@@ -65,6 +65,11 @@ class Invoice extends ActiveRecord
                 'message'        => 'accountFrom doesn\'t exist',
             ],
             [['account_id_to'], 'exist', 'targetRelation' => 'accountTo', 'message' => 'accountTo doesn\'t exist'],
+            [['account_id_from', 'account_id_to'], function() {
+                if ($this->account_id_from === $this->account_id_to) {
+                    $this->addError('account_id_from', 'Source and target accounts can\'t be identical');
+                }
+            }],
         ];
     }
 
