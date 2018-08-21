@@ -9,6 +9,8 @@ return [
         'amount' => 0,
         'hold'   => 0,
         'type'   => Account::TYPE_NORMAL,
+        'created_at' => 1534844663,
+        'updated_at' => 1534844663,
     ],
     'second test' => [
         'id'     => 2,
@@ -16,5 +18,7 @@ return [
         'amount' => 0,
         'hold'   => 0,
         'type'   => Account::TYPE_NORMAL,
+        'created_at' => 1534844663,
+        'updated_at' => 1534844663,
     ],
 ];
