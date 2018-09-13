@@ -79,6 +79,10 @@ class Module extends BaseModule
             'account_id_to'   => $accountTo,
         ];
 
-        return new $this->modelMap['Invoice']($attributes);
+        /** @var ActiveRecord $invoice */
+        $invoice = new $this->modelMap['Invoice']($attributes);
+        $invoice->save();
+
+        return $invoice;
     }
 }
