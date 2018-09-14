@@ -18,6 +18,6 @@ install:
 
 script:
   #  - docker-compose exec -T app php -S 127.0.0.1:8080 > /dev/null 2>&1 & # will use with acceptance testing
+  - docker-compose exec -T app php ./vendor/bin/codecept run --debug
   - docker-compose exec -T app php vendor/bin/phpcs --standard=PSR2 --extensions=php -p \
     --ignore=/vendor,/tests/unit,/tests/integration,/tests/_support,/tests/_app/yii.php,/tests/_bootstrap.php,/migrations --report=summary ./
-  - docker-compose exec -T app php ./vendor/bin/codecept run --debug
