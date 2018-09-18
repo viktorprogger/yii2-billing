@@ -50,7 +50,7 @@ class Account extends ActiveRecord
             [['amount', 'hold', 'type', 'title'], 'required'],
             [['type', 'owner_id'], 'integer'],
             [['amount', 'hold', 'owner_id',], 'number', 'min' => 0],
-            [['amount', 'hold'], function() {
+            [['amount', 'hold'], function () {
                 if ($this->amountAvailable < 0) {
                     $this->addError('Недостаточно средств на счете');
                 }
