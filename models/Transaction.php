@@ -2,6 +2,7 @@
 
 namespace miolae\billing\models;
 
+use miolae\billing\exceptions\TransactionException;
 use miolae\billing\traits\BlameableTrait;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
@@ -36,8 +37,8 @@ class Transaction extends ActiveRecord
     const TYPE_CREATE = 1;
     /** Transaction is created on holding account funds */
     const TYPE_HOLD = 2;
-    /** Transaction is created on invoice success (move held funds to the target account) */
-    const TYPE_SUCCESS = 3;
+    /** Transaction is created on invoice finish (move held funds to the target account) */
+    const TYPE_FINISH = 3;
     /** Transaction is created on invoice cancellation */
     const TYPE_CANCEL = 4;
 
@@ -63,5 +64,13 @@ class Transaction extends ActiveRecord
     public function getInvoice()
     {
         return $this->hasOne(Invoice::class, ['id', 'invoice_id']);
+    }
+
+    public function fail()
+    {
+        $this->status = static::STATUS_FAIL;
+        if (!$this->save()) {
+            throw new TransactionException($this->getErrorSummary(true));
+        }
     }
 }
