@@ -2,12 +2,15 @@
 
 namespace miolae\billing;
 
+use miolae\billing\exceptions\TransactionException;
 use miolae\billing\models\Account;
 use miolae\billing\models\Invoice;
 use miolae\billing\models\Transaction;
 use yii\base\Component;
+use yii\base\InvalidConfigException;
 use yii\base\Module as BaseModule;
 use yii\db\ActiveRecord;
+use yii\db\Connection;
 
 /**
  * Class Module
@@ -84,5 +87,76 @@ class Module extends BaseModule
         $invoice->save();
 
         return $invoice;
+    }
+
+    /**
+     * Finish transferring funds for a holded invoice
+     *
+     * @param Invoice $invoice invoice in status HOLD
+     *
+     * @return bool
+     * @throws InvalidConfigException
+     * @throws TransactionException
+     * @throws \yii\db\Exception
+     */
+    public function finish(ActiveRecord $invoice): bool
+    {
+        if (!$invoice instanceof $this->modelMap['Invoice']) {
+            throw new InvalidConfigException('Invoice must be a class of ' . $this->modelMap['Invoice']);
+        }
+
+        if ($invoice->status !== $invoice::STATUS_HOLD) {
+            $invoice->addError('status', 'Invoice must be in "HOLD" status when finishing');
+
+            return false;
+        }
+
+        /** @var Transaction $transactionClass */
+        $transactionClass = $this->modelMap['Transaction'];
+        $attributes = [
+            'invoice_id' => $invoice->id,
+            'type' => $transactionClass::TYPE_FINISH,
+        ];
+        /** @var Transaction $transaction */
+        $transaction = new $transactionClass($attributes);
+        if (!$transaction->save()) {
+            throw new TransactionException($transaction->getErrorSummary(true));
+        }
+
+        $dbTransact = $this->db->beginTransaction();
+
+        $invoice->accountFrom->amount -= $invoice->amount;
+        $invoice->accountFrom->hold -= $invoice->amount;
+        if (!$invoice->accountFrom->save()) {
+            $invoice->addLinkedErrors('accountFrom', $invoice->accountFrom);
+            $dbTransact->rollBack();
+            $transaction->fail();
+        }
+
+        $invoice->accountTo->amount += $invoice->amount;
+        if (!$invoice->accountTo->save()) {
+            $invoice->addLinkedErrors('accountTo', $invoice->accountTo);
+            $dbTransact->rollBack();
+            $transaction->fail();
+        }
+
+        $invoice->accountTo->amount += $invoice->amount;
+        if (!$invoice->accountTo->save()) {
+            $invoice->addLinkedErrors('accountTo', $invoice->accountTo);
+            $dbTransact->rollBack();
+            $transaction->fail();
+        }
+
+        $invoice->status = $invoice::STATUS_SUCCESS;
+        if (!$invoice->save()) {
+            $dbTransact->rollBack();
+            $transaction->fail();
+        }
+
+        $transaction->status = $transactionClass::STATUS_SUCCESS;
+        $transaction->save();
+
+        $dbTransact->commit();
+        return true;
     }
 }
