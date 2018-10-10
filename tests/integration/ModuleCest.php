@@ -42,8 +42,8 @@ class ModuleCest
         $amount = 3;
         $invoice = $module->createInvoice($accountFrom, $accountTo, $amount);
 
-        $I->assertEquals($accountFrom, $invoice->account_id_from);
-        $I->assertEquals($accountTo, $invoice->account_id_to);
+        $I->assertEquals($accountFrom->id, $invoice->account_id_from);
+        $I->assertEquals($accountTo->id, $invoice->account_id_to);
         $I->assertEquals($amount, $invoice->amount);
     }
 }
