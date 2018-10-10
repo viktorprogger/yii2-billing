@@ -7,29 +7,6 @@ services:
       - ./:/app
     depends_on:
       - db
-      - mailcatcher
-
-  webpacker:
-    image: node:9-alpine
-    working_dir: /app
-    volumes:
-      - ./:/app
-    command: /bin/true
-
-  nginx:
-    image: nginx:1.12-alpine
-    ports:
-      - 80:80
-    volumes:
-      - ./:/app
-      - ./docker/nginx/vhost.conf:/etc/nginx/conf.d/vhost.conf
-    depends_on:
-      - app
-
-  mailcatcher:
-    image: schickling/mailcatcher:latest
-    ports:
-      - 1080:1080
 
   db:
     image: mysql:5.7
@@ -43,3 +20,14 @@ services:
       MYSQL_DATABASE: billing_test
       MYSQL_USER: billing_test
       MYSQL_PASSWORD: billing_test
+
+# nginx is for for acceptance testing for late
+#  nginx:
+#    image: nginx:1.12-alpine
+#    ports:
+#      - 80:80
+#    volumes:
+#      - ./:/app
+#      - ./docker/nginx/vhost.conf:/etc/nginx/conf.d/vhost.conf
+#    depends_on:
+#      - app
