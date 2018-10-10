@@ -11,13 +11,14 @@ use yii\base\InvalidConfigException;
 use yii\base\Module as BaseModule;
 use yii\db\ActiveRecord;
 use yii\db\Connection;
+use yii\db\Transaction as DBTransaction;
 
 /**
  * Class Module
  *
  * @package miolae\billing
  *
- * @property-read Component|null db
+ * @property-read Connection|null db
  */
 class Module extends BaseModule
 {
@@ -50,11 +51,8 @@ class Module extends BaseModule
      */
     public function getDb(): ?Component
     {
-        /** @noinspection OneTimeUseVariablesInspection */
-        /** @var Component $db */
-        $db = \Yii::$app->get($this->dbConnection);
-
-        return $db;
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        return \Yii::$app->get($this->dbConnection);
     }
 
     /**
@@ -96,6 +94,9 @@ class Module extends BaseModule
      * @param ActiveRecord $invoice
      *
      * @return bool
+     *
+     * @throws TransactionException
+     * @throws \yii\db\Exception
      */
     public function hold(ActiveRecord $invoice): bool
     {
@@ -115,32 +116,22 @@ class Module extends BaseModule
         ];
 
         /** @var Transaction $transaction */
-        $transaction = new $transactionClass($attributes);
-        if (!$transaction->save()) {
-            throw new TransactionException($transaction->getErrorSummary(true));
-        }
+        $transaction = $transactionClass::create($attributes);
 
         $dbTransact = $this->db->beginTransaction();
 
         $invoice->accountFrom->hold += $invoice->amount;
-        if (!$invoice->accountFrom->save()) {
-            $invoice->addLinkedErrors('accountFrom', $invoice->accountFrom);
-            $dbTransact->rollBack();
-            $transaction->fail();
-        }
-
-        $transaction->status = $transactionClass::STATUS_SUCCESS;
-        if (!$transaction->save()) {
-            $invoice->addLinkedErrors('transaction', $transaction);
-            $dbTransact->rollBack();
-            $transaction->fail();
+        if (!static::saveModel($invoice->accountFrom, $invoice, $dbTransact, $transaction)) {
+            return false;
         }
 
         $invoice->status = $invoice::STATUS_HOLD;
-        if (!$invoice->save()) {
-            $dbTransact->rollBack();
-            $transaction->fail();
+        if (!static::saveModel($invoice, $invoice, $dbTransact, $transaction)) {
+            return false;
         }
+
+        $transaction->success();
+        $dbTransact->commit();
 
         return true;
     }
@@ -174,45 +165,54 @@ class Module extends BaseModule
             'type' => $transactionClass::TYPE_FINISH,
         ];
         /** @var Transaction $transaction */
-        $transaction = new $transactionClass($attributes);
-        if (!$transaction->save()) {
-            throw new TransactionException($transaction->getErrorSummary(true));
-        }
+        $transaction = $transactionClass::create($attributes);
 
         $dbTransact = $this->db->beginTransaction();
 
         $invoice->accountFrom->amount -= $invoice->amount;
         $invoice->accountFrom->hold -= $invoice->amount;
-        if (!$invoice->accountFrom->save()) {
-            $invoice->addLinkedErrors('accountFrom', $invoice->accountFrom);
-            $dbTransact->rollBack();
-            $transaction->fail();
+        if (!static::saveModel($invoice->accountFrom, $invoice, $dbTransact, $transaction)) {
+            return false;
         }
 
         $invoice->accountTo->amount += $invoice->amount;
-        if (!$invoice->accountTo->save()) {
-            $invoice->addLinkedErrors('accountTo', $invoice->accountTo);
-            $dbTransact->rollBack();
-            $transaction->fail();
-        }
-
-        $invoice->accountTo->amount += $invoice->amount;
-        if (!$invoice->accountTo->save()) {
-            $invoice->addLinkedErrors('accountTo', $invoice->accountTo);
-            $dbTransact->rollBack();
-            $transaction->fail();
+        if (!static::saveModel($invoice->accountTo, $invoice, $dbTransact, $transaction)) {
+            return false;
         }
 
         $invoice->status = $invoice::STATUS_SUCCESS;
-        if (!$invoice->save()) {
-            $dbTransact->rollBack();
-            $transaction->fail();
+        if (!static::saveModel($invoice, $invoice, $dbTransact, $transaction)) {
+            return false;
         }
 
-        $transaction->status = $transactionClass::STATUS_SUCCESS;
-        $transaction->save();
-
+        $transaction->success();
         $dbTransact->commit();
+
+        return true;
+    }
+
+    /**
+     * @param ActiveRecord  $model
+     * @param Invoice       $invoice
+     * @param DBTransaction $dbTransact
+     * @param Transaction   $transaction
+     *
+     * @return bool
+     * @throws \yii\db\Exception
+     */
+    protected static function saveModel(ActiveRecord $model, ActiveRecord $invoice, DBTransaction $dbTransact, ActiveRecord $transaction): bool
+    {
+        if (!$model->save()) {
+            if ($model !== $invoice) {
+                $invoice->addLinkedErrors('accountFrom', $invoice->accountFrom);
+            }
+
+            $dbTransact->rollBack();
+            $transaction->fail();
+
+            return false;
+        }
+
         return true;
     }
 }

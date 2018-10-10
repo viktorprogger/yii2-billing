@@ -66,9 +66,32 @@ class Transaction extends ActiveRecord
         return $this->hasOne(Invoice::class, ['id', 'invoice_id']);
     }
 
-    public function fail()
+    /**
+     * @param array $config will be passed to constructor
+     *
+     * @return Transaction
+     */
+    public static function create($config = []): self
+    {
+        $model = new static($config);
+        if (!$model->save()) {
+            throw new TransactionException($model->getErrorSummary(true));
+        }
+
+        return $model;
+    }
+
+    public function fail(): void
     {
         $this->status = static::STATUS_FAIL;
+        if (!$this->save()) {
+            throw new TransactionException($this->getErrorSummary(true));
+        }
+    }
+
+    public function success(): void
+    {
+        $this->status = static::STATUS_SUCCESS;
         if (!$this->save()) {
             throw new TransactionException($this->getErrorSummary(true));
         }
