@@ -2,18 +2,23 @@
 
 namespace miolae\billing;
 
+use miolae\billing\exceptions\TransactionException;
 use miolae\billing\models\Account;
 use miolae\billing\models\Invoice;
 use miolae\billing\models\Transaction;
 use yii\base\Component;
+use yii\base\InvalidConfigException;
 use yii\base\Module as BaseModule;
 use yii\db\ActiveRecord;
+use yii\db\Connection;
+use yii\db\Transaction as DBTransaction;
 
 /**
  * Class Module
+ *
  * @package miolae\billing
  *
- * @property-read Component|null db
+ * @property-read Connection|null db
  */
 class Module extends BaseModule
 {
@@ -46,17 +51,14 @@ class Module extends BaseModule
      */
     public function getDb(): ?Component
     {
-        /** @noinspection OneTimeUseVariablesInspection */
-        /** @var Component $db */
-        $db = \Yii::$app->get($this->dbConnection);
-
-        return $db;
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        return \Yii::$app->get($this->dbConnection);
     }
 
     /**
      * @param int|ActiveRecord $accountFrom
      * @param int|ActiveRecord $accountTo
-     * @param $amount
+     * @param                  $amount
      *
      * @return Invoice|ActiveRecord
      */
@@ -84,5 +86,133 @@ class Module extends BaseModule
         $invoice->save();
 
         return $invoice;
+    }
+
+    /**
+     * Hold funds on accountFrom of the given invoice
+     *
+     * @param ActiveRecord $invoice
+     *
+     * @return bool
+     *
+     * @throws TransactionException
+     * @throws \yii\db\Exception
+     */
+    public function hold(ActiveRecord $invoice): bool
+    {
+        /** @var Invoice $invoice */
+        /** @var Transaction $transactionClass */
+        $transactionClass = $this->modelMap['Transaction'];
+
+        if ($invoice->status !== $invoice::STATUS_CREATE) {
+            $invoice->addError('status', 'Invoice must be in "CREATED" status when holding');
+
+            return false;
+        }
+
+        $attributes = [
+            'invoice_id' => $invoice->id,
+            'type' => $transactionClass::TYPE_HOLD,
+        ];
+
+        /** @var Transaction $transaction */
+        $transaction = $transactionClass::create($attributes);
+
+        $dbTransact = $this->db->beginTransaction();
+
+        $invoice->accountFrom->hold += $invoice->amount;
+        if (!static::saveModel($invoice->accountFrom, $invoice, $dbTransact, $transaction)) {
+            return false;
+        }
+
+        $invoice->status = $invoice::STATUS_HOLD;
+        if (!static::saveModel($invoice, $invoice, $dbTransact, $transaction)) {
+            return false;
+        }
+
+        $transaction->success();
+        $dbTransact->commit();
+
+        return true;
+    }
+
+    /**
+     * Finish transferring funds for a holded invoice
+     *
+     * @param Invoice $invoice invoice in status HOLD
+     *
+     * @return bool
+     * @throws InvalidConfigException
+     * @throws TransactionException
+     * @throws \yii\db\Exception
+     */
+    public function finish(ActiveRecord $invoice): bool
+    {
+        if (!$invoice instanceof $this->modelMap['Invoice']) {
+            throw new InvalidConfigException('Invoice must be a class of ' . $this->modelMap['Invoice']);
+        }
+
+        if ($invoice->status !== $invoice::STATUS_HOLD) {
+            $invoice->addError('status', 'Invoice must be in "HOLD" status when finishing');
+
+            return false;
+        }
+
+        /** @var Transaction $transactionClass */
+        $transactionClass = $this->modelMap['Transaction'];
+        $attributes = [
+            'invoice_id' => $invoice->id,
+            'type' => $transactionClass::TYPE_FINISH,
+        ];
+        /** @var Transaction $transaction */
+        $transaction = $transactionClass::create($attributes);
+
+        $dbTransact = $this->db->beginTransaction();
+
+        $invoice->accountFrom->amount -= $invoice->amount;
+        $invoice->accountFrom->hold -= $invoice->amount;
+        if (!static::saveModel($invoice->accountFrom, $invoice, $dbTransact, $transaction)) {
+            return false;
+        }
+
+        $invoice->accountTo->amount += $invoice->amount;
+        if (!static::saveModel($invoice->accountTo, $invoice, $dbTransact, $transaction)) {
+            return false;
+        }
+
+        $invoice->status = $invoice::STATUS_SUCCESS;
+        if (!static::saveModel($invoice, $invoice, $dbTransact, $transaction)) {
+            return false;
+        }
+
+        $transaction->success();
+        $dbTransact->commit();
+
+        return true;
+    }
+
+    /**
+     * @param ActiveRecord  $model
+     * @param Invoice       $invoice
+     * @param DBTransaction $dbTransact
+     * @param Transaction   $transaction
+     *
+     * @return bool
+     * @throws \yii\db\Exception
+     */
+    protected static function saveModel(ActiveRecord $model, ActiveRecord $invoice, DBTransaction $dbTransact, ActiveRecord $transaction): bool
+    {
+        if (!$model->save()) {
+            if ($model !== $invoice) {
+                $invoice->addLinkedErrors('accountFrom', $invoice->accountFrom);
+            }
+
+            $dbTransact->rollBack();
+            $transaction->fail();
+
+            return false;
+        }
+
+        return true;
     }
 }
