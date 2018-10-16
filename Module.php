@@ -11,6 +11,7 @@ use yii\db\ActiveRecord;
 
 /**
  * Class Module
+ *
  * @package miolae\billing
  *
  * @property-read Component|null db
@@ -56,7 +57,7 @@ class Module extends BaseModule
     /**
      * @param int|ActiveRecord $accountFrom
      * @param int|ActiveRecord $accountTo
-     * @param $amount
+     * @param                  $amount
      *
      * @return Invoice|ActiveRecord
      */
@@ -84,5 +85,55 @@ class Module extends BaseModule
         $invoice->save();
 
         return $invoice;
+    }
+
+    /**
+     * Hold funds on accountFrom of the given invoice
+     *
+     * @param ActiveRecord $invoice
+     *
+     * @return bool
+     */
+    public function hold(ActiveRecord $invoice): bool
+    {
+        /** @var Invoice $invoice */
+        /** @var Transaction $transactionClass */
+        $transactionClass = $this->modelMap['Transaction'];
+
+        if ($invoice->status !== $invoice::STATUS_CREATE) {
+            $invoice->addError('status', 'Invoice must be in "CREATED" status when holding');
+
+            return false;
+        }
+
+        $attributes = [
+            'invoice_id' => $invoice->id,
+            'type' => $transactionClass::TYPE_HOLD,
+        ];
+
+        /** @var Transaction $transaction */
+        $transaction = new $transactionClass($attributes);
+        if (!$transaction->save()) {
+            $invoice->addLinkedErrors('transaction', $transaction);
+
+            return false;
+        }
+
+        $invoice->accountFrom->hold += $invoice->amount;
+        if (!$invoice->accountFrom->save()) {
+            $invoice->addLinkedErrors('accountFrom', $invoice->accountFrom);
+
+            return false;
+        }
+
+        $transaction->status = $transactionClass::STATUS_SUCCESS;
+        if (!$transaction->save()) {
+            $invoice->addLinkedErrors('transaction', $transaction);
+
+            return false;
+        }
+
+        $invoice->status = $invoice::STATUS_HOLD;
+        return $invoice->save();
     }
 }

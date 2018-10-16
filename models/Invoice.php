@@ -8,20 +8,22 @@ use yii\db\ActiveRecord;
 
 /**
  * Class Invoice
+ *
  * @package miolae\billing\models
  *
- * @property int     id
- * @property int     account_id_from
- * @property int     account_id_to
- * @property Account accountFrom
- * @property Account accountTo
- * @property float   amount
- * @property int     status Current invoice status.
- * @property string  reason The reason why this invoice is created. E.g. "refill account with PayPal".
- * @property int     created_at
- * @property int     updated_at
- * @property int     created_by
- * @property int     updated_by
+ * @property int           id
+ * @property int           account_id_from
+ * @property int           account_id_to
+ * @property Account       accountFrom
+ * @property Account       accountTo
+ * @property Transaction[] transactions
+ * @property float         amount
+ * @property int           status Current invoice status.
+ * @property string        reason The reason why this invoice is created. E.g. "refill account with PayPal".
+ * @property int           created_at
+ * @property int           updated_at
+ * @property int           created_by
+ * @property int           updated_by
  */
 class Invoice extends ActiveRecord
 {
@@ -86,5 +88,18 @@ class Invoice extends ActiveRecord
     public function getTransactions()
     {
         return $this->hasMany(Transaction::class, ['invoice_id' => 'id']);
+    }
+
+    public function addLinkedErrors(string $attribute, ActiveRecord $transaction)
+    {
+        if (empty($transaction->getErrors())) {
+            $this->addError($attribute, "Can't save $attribute");
+        } else {
+            foreach ($transaction->getErrors() as $attr => $errors) {
+                foreach ($errors as $error) {
+                    $this->addError($attribute, "$attr: $error");
+                }
+            }
+        }
     }
 }
