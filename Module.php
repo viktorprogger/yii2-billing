@@ -192,6 +192,58 @@ class Module extends BaseModule
     }
 
     /**
+     * Cancel an invoice
+     *
+     * @param Invoice $invoice invoice in status HOLD
+     *
+     * @return bool
+     * @throws InvalidConfigException
+     * @throws TransactionException
+     * @throws \yii\db\Exception
+     */
+    public function cancel(ActiveRecord $invoice): bool
+    {
+        if (!$invoice instanceof $this->modelMap['Invoice']) {
+            throw new InvalidConfigException('Invoice must be a class of ' . $this->modelMap['Invoice']);
+        }
+
+        if (!in_array($invoice->status, [$invoice::STATUS_HOLD, $invoice::STATUS_CREATE], true)) {
+            $invoice->addError('status', 'Can\'t cancel finished invoice');
+
+            return false;
+        }
+
+        /** @var Transaction $transactionClass */
+        $transactionClass = $this->modelMap['Transaction'];
+        $attributes = [
+            'invoice_id' => $invoice->id,
+            'type' => $transactionClass::TYPE_CANCEL,
+        ];
+        /** @var Transaction $transaction */
+        $transaction = $transactionClass::create($attributes);
+
+        $dbTransact = $this->db->beginTransaction();
+
+        if ($invoice->status === $invoice::STATUS_HOLD) {
+            $invoice->accountFrom->hold -= $invoice->amount;
+
+            if (!static::saveModel($invoice->accountFrom, $invoice, $dbTransact, $transaction)) {
+                return false;
+            }
+        }
+
+        $invoice->status = $invoice::STATUS_CANCEL;
+        if (!static::saveModel($invoice, $invoice, $dbTransact, $transaction)) {
+            return false;
+        }
+
+        $transaction->success();
+        $dbTransact->commit();
+
+        return true;
+    }
+
+    /**
      * @param ActiveRecord  $model
      * @param Invoice       $invoice
      * @param DBTransaction $dbTransact
