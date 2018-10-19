@@ -261,17 +261,10 @@ class Module extends BaseModule
 
         $this->hold($invoice);
         if ($invoice->hasErrors()) {
-            $invoiceToCancel = $this->modelMap['Invoice']::findOne($invoice->id);
-            $this->cancel($invoiceToCancel);
-
             return $invoice;
         }
 
         $this->finish($invoice);
-        if ($invoice->hasErrors()) {
-            $invoiceToCancel = $this->modelMap['Invoice']::findOne($invoice->id);
-            $this->cancel($invoiceToCancel);
-        }
 
         return $invoice;
     }
