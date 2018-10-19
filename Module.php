@@ -244,6 +244,36 @@ class Module extends BaseModule
     }
 
     /**
+     * @param       $accountFrom
+     * @param       $accountTo
+     * @param float $amount
+     *
+     * @return ActiveRecord
+     * @throws \yii\db\Exception
+     * @throws InvalidConfigException
+     */
+    public function quickPay($accountFrom, $accountTo, float $amount): ActiveRecord
+    {
+        $invoice = $this->createInvoice($accountFrom, $accountTo, $amount);
+        if ($invoice->hasErrors()) {
+            return $invoice;
+        }
+
+        $this->hold($invoice);
+        if ($invoice->hasErrors()) {
+            return $invoice;
+        }
+
+        $this->finish($invoice);
+        if ($invoice->hasErrors()) {
+            $invoice = $this->modelMap['Invoice']::findOne($invoice->id);
+            $this->cancel($invoice);
+        }
+
+        return $invoice;
+    }
+
+    /**
      * @param ActiveRecord  $model
      * @param Invoice       $invoice
      * @param DBTransaction $dbTransact
