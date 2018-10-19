@@ -261,6 +261,9 @@ class Module extends BaseModule
 
         $this->hold($invoice);
         if ($invoice->hasErrors()) {
+            $invoice = $this->modelMap['Invoice']::findOne($invoice->id);
+            $this->cancel($invoice);
+
             return $invoice;
         }
 
