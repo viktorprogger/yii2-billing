@@ -4,7 +4,7 @@ $db = [
     'class' => 'yii\db\Connection',
     'dsn' => 'mysql:host=localhost;dbname=billing_test',
     'username' => 'billing_test',
-    'password' => 'billing_test',
+    'password' => '',
     'charset' => 'utf8',
 ];
 
