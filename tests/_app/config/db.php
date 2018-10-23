@@ -2,7 +2,7 @@
 
 $db = [
     'class' => 'yii\db\Connection',
-    'dsn' => 'mysql:host=db;dbname=billing_test',
+    'dsn' => 'mysql:host=mysql;dbname=billing_test',
     'username' => 'billing_test',
     'password' => 'billing_test',
     'charset' => 'utf8',
