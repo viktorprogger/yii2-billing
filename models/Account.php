@@ -50,8 +50,8 @@ class Account extends ActiveRecord
             [['amount', 'hold', 'type', 'title'], 'required'],
             [['type', 'owner_id'], 'integer'],
             [['hold', 'owner_id',], 'number', 'min' => 0],
-            [['amount', 'hold'], [$this, 'validateAmountAvailable']],
-            [['amount'], [$this, 'validateAmount']]
+            [['amount', 'hold'], 'validateAmountAvailable'],
+            [['amount'], 'validateAmount'],
         ];
     }
 
