@@ -19,3 +19,7 @@ install:
 script:
   #  - docker-compose exec -T app php -S 127.0.0.1:8080 > /dev/null 2>&1 & # will use with acceptance testing
   - docker-compose exec -T app php ./vendor/bin/codecept run --debug
+
+cache:
+    directories:
+        - vendor
