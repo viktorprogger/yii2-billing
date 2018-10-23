@@ -22,6 +22,14 @@ use yii\db\Transaction as DBTransaction;
  */
 class Module extends BaseModule
 {
+    /** @var int BlackHole accounts will always have zero in their amount */
+    const BLACK_HOLE_ZERO = 0;
+    /**
+     * @var int BlackHole accounts will have endless amount and won't be checked for correct amount on saving.
+     * Held count will always be a zero.
+     */
+    const BLACK_HOLE_ENDLESS = 1;
+
     /** @var array $modelMapDefault */
     protected $modelMapDefault = [
         'Invoice'     => Invoice::class,
@@ -34,6 +42,8 @@ class Module extends BaseModule
 
     /** @var string DB connection name */
     public $dbConnection = 'db';
+
+    public $blackHoleStrategy = self::BLACK_HOLE_ZERO;
 
     public function init()
     {
