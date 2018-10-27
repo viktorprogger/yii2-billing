@@ -3,10 +3,12 @@
 namespace miolae\billing;
 
 use miolae\billing\exceptions\TransactionException;
+use miolae\billing\helpers\EventHelper;
 use miolae\billing\models\Account;
 use miolae\billing\models\Invoice;
 use miolae\billing\models\Transaction;
 use yii\base\Component;
+use yii\base\Event;
 use yii\base\InvalidConfigException;
 use yii\base\Module as BaseModule;
 use yii\db\ActiveRecord;
@@ -35,6 +37,7 @@ class Module extends BaseModule
         'Invoice'     => Invoice::class,
         'Account'     => Account::class,
         'Transaction' => Transaction::class,
+        'EventHelper' => EventHelper::class,
     ];
 
     /** @var ActiveRecord[] Model map */
@@ -48,12 +51,8 @@ class Module extends BaseModule
     public function init()
     {
         parent::init();
-
-        foreach ($this->modelMapDefault as $key => $model) {
-            if (empty($this->modelMap[$key])) {
-                $this->modelMap[$key] = $model;
-            }
-        }
+        $this->mapModels();
+        $this->eventsAttach();
     }
 
     /**
@@ -302,5 +301,25 @@ class Module extends BaseModule
         }
 
         return true;
+    }
+
+    protected function mapModels(): void
+    {
+        foreach ($this->modelMapDefault as $key => $model) {
+            if (empty($this->modelMap[$key])) {
+                $this->modelMap[$key] = $model;
+            }
+        }
+    }
+
+    protected function eventsAttach(): void
+    {
+        $account = $this->modelMap['Account'];
+        Event::on(
+            $account,
+            $account::EVENT_BEFORE_UPDATE,
+            [EventHelper::class, 'accountBlackHoleZero'],
+            ['blackHoleStrategy' => $this->blackHoleStrategy]
+        );
     }
 }
