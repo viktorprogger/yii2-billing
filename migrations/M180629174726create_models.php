@@ -47,7 +47,6 @@ class M180629174726create_models extends Migration
             'id'          => $this->primaryKey(),
             'invoice_id'  => $this->integer()->notNull(),
             'status'      => $this->tinyInteger()->notNull(),
-            'amount'      => $this->float(4)->notNull(),
             'type'        => $this->tinyInteger()->notNull(),
             'reason'      => $this->string(),
 
