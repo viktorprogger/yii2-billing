@@ -13,7 +13,7 @@ class InvoiceCest
     }
 
     /**
-     * @covers Invoice::rules()
+     * @covers \miolae\billing\models\Invoice::rules()
      * @dataProvider validateProvider
      * @param $result
      * @param $attributes

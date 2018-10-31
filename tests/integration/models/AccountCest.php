@@ -7,7 +7,7 @@ use miolae\billing\models\Account;
 class AccountCest
 {
     /**
-     * @covers       Account::rules()
+     * @covers       \miolae\billing\models\Account::rules()
      * @dataProvider validateProvider
      * @param $result
      * @param $attributes

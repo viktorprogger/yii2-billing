@@ -17,6 +17,8 @@ modules:
             configFile: 'tests/_app/config/console.php'
 coverage:
     enabled: true
+    low_limit: 40
+    high_limit: 80
     include:
         - /models/*
         - /traits/*

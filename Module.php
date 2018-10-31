@@ -287,8 +287,12 @@ class Module extends BaseModule
      * @return bool
      * @throws \yii\db\Exception
      */
-    protected static function saveModel(ActiveRecord $model, ActiveRecord $invoice, DBTransaction $dbTransact, ActiveRecord $transaction): bool
-    {
+    protected static function saveModel(
+        ActiveRecord $model,
+        ActiveRecord $invoice,
+        DBTransaction $dbTransact,
+        ActiveRecord $transaction
+    ): bool {
         if (!$model->save()) {
             if ($model !== $invoice) {
                 $invoice->addLinkedErrors('accountFrom', $invoice->accountFrom);
@@ -317,7 +321,7 @@ class Module extends BaseModule
         $account = $this->modelMap['Account'];
         Event::on(
             $account,
-            $account::EVENT_BEFORE_UPDATE,
+            $account::EVENT_BEFORE_VALIDATE,
             [EventHelper::class, 'accountBlackHoleZero'],
             ['blackHoleStrategy' => $this->blackHoleStrategy]
         );

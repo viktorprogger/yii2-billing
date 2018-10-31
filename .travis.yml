@@ -1,6 +1,11 @@
 sudo: required
 dist: trusty
 
+addons:
+    artifacts:
+        paths:
+            - tests/_output/coverage
+
 env:
   - COMPOSE_FILE=docker/travis.yml
 
@@ -18,8 +23,11 @@ install:
 
 script:
   #  - docker-compose exec -T app php -S 127.0.0.1:8080 > /dev/null 2>&1 & # will use with acceptance testing
-  - docker-compose exec -T app php ./vendor/bin/codecept run --debug
+  - docker-compose exec -T app php ./vendor/bin/phpcs --standard=PSR2 --extensions=php --ignore=/vendor/,/docker/,/migrations/,/tests/ ./
+  - docker-compose exec -T app php ./vendor/bin/codecept run --debug --coverage-html
 
 cache:
     directories:
         - vendor
+
+

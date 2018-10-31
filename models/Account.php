@@ -85,7 +85,7 @@ class Account extends ActiveRecord
 
     public function validateAmountAvailable()
     {
-        if ($this->type !== static::TYPE_BLACKHOLE || $this->amountAvailable < 0) {
+        if ($this->type !== static::TYPE_BLACKHOLE && $this->amountAvailable < 0) {
             $this->addError('Недостаточно средств на счете');
         }
     }
