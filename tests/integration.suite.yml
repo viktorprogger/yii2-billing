@@ -8,5 +8,6 @@ modules:
         - Asserts
         - \Helper\Unit
         - Yii2:
-            - parts:
+            cleanup: false
+            parts:
                 - orm

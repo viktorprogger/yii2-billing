@@ -20,4 +20,9 @@ return [
             'migrationPath' => ['@miolae/billing/migrations'],
         ],
     ],
+    'modules' => [
+        'billing' => [
+            'class' => \miolae\billing\Module::class,
+        ],
+    ],
 ];

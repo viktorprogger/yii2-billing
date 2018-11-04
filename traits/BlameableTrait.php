@@ -7,7 +7,8 @@ use yii\behaviors\BlameableBehavior;
 
 trait BlameableTrait
 {
-    public static function getBlameableBehavior() {
+    public static function getBlameableBehavior()
+    {
         $result = [];
 
         try {
