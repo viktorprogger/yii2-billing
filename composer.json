@@ -2,6 +2,7 @@
   "name": "miolae/yii2-billing",
   "description": "Flexible billing module to manage different accounts and pay systems and make transactions",
   "keywords": ["yii2", "yii2-billing", "billing", "invoice", "finances", "miolae"],
+  "version": "1.0.0",
   "type": "yii2-extension",
   "license": "MIT",
   "support": {

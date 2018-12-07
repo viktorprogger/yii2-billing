@@ -3,4 +3,10 @@
 # yii2-billing
 Billing module for Yii2 to manage accounts and make transactions between them.
 
-This module is in early development state. Full readme will be added after the base API realisation.
+It allows to transact funds in and out of your system and have full detailing of funds movement.
+
+Every user (not only user) can have multiple accounts. I.e. one account for real funds and another account for bonus funds which will be used for other reasons with other rules.
+
+
+## The first release is ready!
+The documentation will be very soon too.
